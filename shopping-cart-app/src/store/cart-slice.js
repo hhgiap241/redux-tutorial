@@ -6,10 +6,12 @@ const cartSlice = createSlice({
     initialState: {
         itemsList: [],
         totalQuantity: 0,
-        showCart: false
+        showCart: false,
+        changed: false
     },
     reducers: {
         addToCart(state, action) {
+            state.changed = true;
             const newItem = action.payload;
             const existingItem = state.itemsList.find(item => item.id === newItem.id);
             if (!existingItem) {
@@ -27,6 +29,7 @@ const cartSlice = createSlice({
             }
         },
         removeFromCart(state, action) {
+            state.changed = true;
             const id = action.payload.id;
             console.log(id);
             const existingItem = state.itemsList.find(item => item.id === id);
@@ -41,41 +44,13 @@ const cartSlice = createSlice({
         },
         setShowCart(state) {
             state.showCart = !state.showCart;
+        },
+        replaceData(state, action) {
+            state.itemsList = action.payload.itemsList;
+            state.totalQuantity = action.payload.totalQuantity;
         }
     }
 });
-export const sendCartData = (cart) => {
-    return async (dispatch) => {
-        // send state as sending request
-        dispatch(uiActions.showNotification({
-            open: true,
-            message: "Sending request...",
-            type: "warning"
-        }));
-        const sendRequest = async () => {
-            const res = await fetch("https://redux-http-example-34915-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json", {
-                method: "PUT",
-                body: JSON.stringify(cart),
-            });
-            const data = await res.json();
-            console.log(data);
-            // send state as request is sent
-            dispatch(uiActions.showNotification({
-                open: true,
-                message: "Sent request to database successfully!",
-                type: "success"
-            }));
-        };
-        try {
-            await sendRequest();
-        } catch (error) {
-            dispatch(uiActions.showNotification({
-                open: true,
-                message: "Sent request to database failed!",
-                type: "error"
-            }));
-        }
-    }
-}
+
 export const cartActions = cartSlice.actions;
 export default cartSlice;

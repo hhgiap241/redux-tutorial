@@ -4,10 +4,11 @@ import Auth from "./components/Auth";
 import Layout from "./components/Layout";
 import {useDispatch, useSelector} from "react-redux";
 import Notification from "./components/Notification";
-import {uiActions} from "./store/ui-slice";
-import {sendCartData} from "./store/cart-slice";
+import {fetchData, sendCartData} from "./store/cart-actions";
+
 
 let isFirstRender = true;
+
 function App() {
     const dispatch = useDispatch();
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
@@ -16,13 +17,18 @@ function App() {
     const quantity = useSelector(state => state.cart.totalQuantity);
     console.log(quantity);
     useEffect(() => {
+        dispatch(fetchData());
+    }, [dispatch]);
+    useEffect(() => {
         // if first render, do nothing
         if (isFirstRender) {
             isFirstRender = false;
             return;
         }
         // if not first render, send request
-        dispatch(sendCartData(cart));
+        if (cart.changed) {
+            dispatch(sendCartData(cart));
+        }
     }, [cart, dispatch]);
     const notification = useSelector(state => state.ui.notification);
     return (
