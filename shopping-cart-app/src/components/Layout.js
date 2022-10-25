@@ -7,7 +7,10 @@ import CartItems from "./CartItems";
 
 const Layout = () => {
     const itemsList = useSelector(state => state.cart.itemsList);
-    const total = 0;
+    let total = 0;
+    itemsList.forEach(item => {
+        total += item.totalPrice;
+    })
     const showCart = useSelector(state => state.cart.showCart);
 
     return (
